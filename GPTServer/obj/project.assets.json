@@ -2,6 +2,23 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "Anthropic.SDK/4.5.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Bcl.AsyncInterfaces": "8.0.0",
+          "Microsoft.Extensions.AI.Abstractions": "9.1.0-preview.1.25064.3"
+        },
+        "compile": {
+          "lib/net8.0/Anthropic.SDK.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Anthropic.SDK.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Humanizer.Core/2.14.1": {
         "type": "package",
         "compile": {
@@ -107,7 +124,7 @@
           "buildMultiTargeting/Microsoft.AspNetCore.Identity.UI.targets": {}
         }
       },
-      "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
+      "Microsoft.Bcl.AsyncInterfaces/8.0.0": {
         "type": "package",
         "compile": {
           "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
@@ -507,6 +524,19 @@
         },
         "runtime": {
           "lib/net8.0/_._": {}
+        }
+      },
+      "Microsoft.Extensions.AI.Abstractions/9.1.0-preview.1.25064.3": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Microsoft.Extensions.AI.Abstractions.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.Extensions.AI.Abstractions.dll": {
+            "related": ".xml"
+          }
         }
       },
       "Microsoft.Extensions.Caching.Abstractions/8.0.0": {
@@ -1200,6 +1230,25 @@
     }
   },
   "libraries": {
+    "Anthropic.SDK/4.5.0": {
+      "sha512": "FwvjsuLiojz1wtwwBeFBSQLaBcmVp0NkDE388RV2fKDhwTvCWX4wDH4vOZNQBfgrhkcH5UjwcXc8wHEbniU8Vg==",
+      "type": "package",
+      "path": "anthropic.sdk/4.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "anthropic.sdk.4.5.0.nupkg.sha512",
+        "anthropic.sdk.nuspec",
+        "icon.png",
+        "lib/net6.0/Anthropic.SDK.dll",
+        "lib/net6.0/Anthropic.SDK.xml",
+        "lib/net8.0/Anthropic.SDK.dll",
+        "lib/net8.0/Anthropic.SDK.xml",
+        "lib/netstandard2.0/Anthropic.SDK.dll",
+        "lib/netstandard2.0/Anthropic.SDK.xml"
+      ]
+    },
     "Humanizer.Core/2.14.1": {
       "sha512": "lQKvtaTDOXnoVJ20ibTuSIOf2i0uO0MPbDhd1jm238I+U/2ZnRENj0cktKZhtchBMtCUSRQ5v4xBCUbKNmyVMw==",
       "type": "package",
@@ -1404,23 +1453,26 @@
         "staticwebassets/V5/lib/jquery/dist/jquery.min.map"
       ]
     },
-    "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
-      "sha512": "UcSjPsst+DfAdJGVDsu346FX0ci0ah+lw3WRtn18NUwEqRt70HaOQ7lI72vy3+1LxtqI3T5GWwV39rQSrCzAeg==",
+    "Microsoft.Bcl.AsyncInterfaces/8.0.0": {
+      "sha512": "3WA9q9yVqJp222P3x1wYIGDAkpjAku0TMUaaQV22g6L67AI0LdOIrVS7Ht2vJfLHGSPVuqN94vIr15qn+HEkHw==",
       "type": "package",
-      "path": "microsoft.bcl.asyncinterfaces/6.0.0",
+      "path": "microsoft.bcl.asyncinterfaces/8.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "LICENSE.TXT",
+        "PACKAGE.md",
         "THIRD-PARTY-NOTICES.TXT",
-        "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll",
-        "lib/net461/Microsoft.Bcl.AsyncInterfaces.xml",
+        "buildTransitive/net461/Microsoft.Bcl.AsyncInterfaces.targets",
+        "buildTransitive/net462/_._",
+        "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll",
+        "lib/net462/Microsoft.Bcl.AsyncInterfaces.xml",
         "lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.dll",
         "lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.xml",
         "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll",
         "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.xml",
-        "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
+        "microsoft.bcl.asyncinterfaces.8.0.0.nupkg.sha512",
         "microsoft.bcl.asyncinterfaces.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -1996,6 +2048,27 @@
         "tools/net461/win-x86/ef.exe",
         "tools/netcoreapp2.0/any/ef.dll",
         "tools/netcoreapp2.0/any/ef.runtimeconfig.json"
+      ]
+    },
+    "Microsoft.Extensions.AI.Abstractions/9.1.0-preview.1.25064.3": {
+      "sha512": "qxGgo8ipnJz9viMQBMrnmYymi9cZWV0kep/wNTHgLhieYBCVvkMnOskaoNzRjCMl9hwEkXnZTQIwYk2WbpmmWA==",
+      "type": "package",
+      "path": "microsoft.extensions.ai.abstractions/9.1.0-preview.1.25064.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "README.md",
+        "lib/net462/Microsoft.Extensions.AI.Abstractions.dll",
+        "lib/net462/Microsoft.Extensions.AI.Abstractions.xml",
+        "lib/net8.0/Microsoft.Extensions.AI.Abstractions.dll",
+        "lib/net8.0/Microsoft.Extensions.AI.Abstractions.xml",
+        "lib/net9.0/Microsoft.Extensions.AI.Abstractions.dll",
+        "lib/net9.0/Microsoft.Extensions.AI.Abstractions.xml",
+        "lib/netstandard2.0/Microsoft.Extensions.AI.Abstractions.dll",
+        "lib/netstandard2.0/Microsoft.Extensions.AI.Abstractions.xml",
+        "microsoft.extensions.ai.abstractions.9.1.0-preview.1.25064.3.nupkg.sha512",
+        "microsoft.extensions.ai.abstractions.nuspec"
       ]
     },
     "Microsoft.Extensions.Caching.Abstractions/8.0.0": {
@@ -3002,6 +3075,7 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Anthropic.SDK >= 4.5.0",
       "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore >= 8.0.2",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.2",
       "Microsoft.AspNetCore.Identity.UI >= 8.0.2",
@@ -3058,6 +3132,10 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "Anthropic.SDK": {
+            "target": "Package",
+            "version": "[4.5.0, )"
+          },
           "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": {
             "target": "Package",
             "version": "[8.0.2, )"

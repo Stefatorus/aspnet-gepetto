@@ -137,3 +137,5 @@ C:\Users\stefa\RiderProjects\aspnet-gepetto\GPTServer\obj\Debug\net8.0\refint\GP
 C:\Users\stefa\RiderProjects\aspnet-gepetto\GPTServer\obj\Debug\net8.0\GPTServer.pdb
 C:\Users\stefa\RiderProjects\aspnet-gepetto\GPTServer\obj\Debug\net8.0\GPTServer.genruntimeconfig.cache
 C:\Users\stefa\RiderProjects\aspnet-gepetto\GPTServer\obj\Debug\net8.0\ref\GPTServer.dll
+C:\Users\stefa\RiderProjects\aspnet-gepetto\GPTServer\bin\Debug\net8.0\Anthropic.SDK.dll
+C:\Users\stefa\RiderProjects\aspnet-gepetto\GPTServer\bin\Debug\net8.0\Microsoft.Extensions.AI.Abstractions.dll

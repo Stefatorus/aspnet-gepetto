@@ -1,6 +1,7 @@
+using Anthropic.SDK;
+using GPTServer.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using GPTServer.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+// Add Anthropic AI
+var anthropicApiKey = builder.Configuration["Anthropic:ApiKey"];
+builder.Services.AddSingleton(new AnthropicClient(anthropicApiKey));
 
 var app = builder.Build();
 
@@ -46,8 +51,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    "default",
+    "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
 app.Run();

@@ -1,6 +1,6 @@
 using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using GPTServer.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GPTServer.Controllers;
 

@@ -6,17 +6,20 @@
     @if (SignInManager.IsSignedIn(User))
     {
         <li class="nav-item dropdown">
-            <a class="nav-link p-0 d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <a class="nav-link p-0 d-flex align-items-center gap-2" href="#" id="userDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
                 <div class="user-avatar">
-                    <span>@User.Identity?.Name?.Substring(0,1).ToUpper()</span>
+                    <span>@User.Identity?.Name?.Substring(0, 1).ToUpper()</span>
                 </div>
                 <span class="d-none d-md-inline me-1">@User.Identity?.Name</span>
                 <i class="fas fa-chevron-down text-muted"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-4 p-2" aria-labelledby="userDropdown">
                 <li>
-                    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new {area = ""})">
-                        <button type="submit" class="dropdown-item rounded-3 d-flex align-items-center gap-2 py-2 text-danger">
+                    <form asp-area="Identity" asp-page="/Account/Logout"
+                          asp-route-returnUrl="@Url.Action("Index", "Home", new {area = ""})">
+                        <button type="submit"
+                                class="dropdown-item rounded-3 d-flex align-items-center gap-2 py-2 text-danger">
                             <i class="fas fa-sign-out-alt"></i>
                             Sign Out
                         </button>
@@ -33,7 +36,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="btn btn-primary px-4 rounded-pill d-flex align-items-center gap-2" asp-area="Identity" asp-page="/Account/Login">
+            <a class="btn btn-primary px-4 rounded-pill d-flex align-items-center gap-2" asp-area="Identity"
+               asp-page="/Account/Login">
                 <i class="fas fa-sign-in-alt"></i>
                 Sign In
             </a>
@@ -89,7 +93,7 @@
     .nav-link:hover .user-avatar {
         transform: scale(1.05);
     }
-    
+
     @@keyframes dropdownFade {
         from {
             opacity: 0;
