@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Chats";
+}
+
+<h1>Chats</h1>
+
+<div id="conversations">
+    <h2>Conversations</h2>
+    <ul id="conversationList">
+        @foreach (var conversation in Model.Conversations)
+        {
+            <li>
+                <a href="@Url.Action("ViewConversation", new { id = conversation.Id })">@conversation.Title</a>
+            </li>
+        }
+    </ul>
+    <button onclick="location.href='@Url.Action("CreateConversation")'">Add New Conversation</button>
+</div>
+
+<div id="chatWindow" style="display: none;">
+    <h2 id="conversationTitle"></h2>
+    <div id="messages">
+        @* Messages will be dynamically loaded here *@
+    </div>
+    <textarea id="messageInput" placeholder="Type your message here..."></textarea>
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+@section Scripts {
+    <script>
+        function sendMessage() {
+            var messageContent = document.getElementById("messageInput").value;
+            // Add logic to send the message to the server and update the chat window
+        }
+    </script>
+}
