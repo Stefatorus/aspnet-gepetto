@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GPTServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2c6a2b09b6a13d1ccfa41061cd362a382e968150")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+78ab3d7db4d16735092538d4566ec593b423f6e2")]
 [assembly: System.Reflection.AssemblyProductAttribute("GPTServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GPTServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
