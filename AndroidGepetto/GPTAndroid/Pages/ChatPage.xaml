@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="GPTAndroid.Pages.ChatPage"
+             Title="Chat">
+
+    <Grid RowDefinitions="*, Auto" Padding="10">
+        <!-- Messages List -->
+        <CollectionView Grid.Row="0" 
+                        ItemsSource="{Binding Messages}"
+                        x:Name="MessagesCollectionView">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="10,5" ColumnDefinitions="*">
+                        <Frame BorderColor="LightGray" 
+                               Padding="10" 
+                               CornerRadius="10"
+                               BackgroundColor="{Binding Sender, Converter={StaticResource MessageColorConverter}}">
+                            <StackLayout>
+                                <Label Text="{Binding Sender}" 
+                                       FontSize="12" 
+                                       TextColor="Gray"/>
+                                <Label Text="{Binding Content}" 
+                                       FontSize="16"/>
+                                <Label Text="{Binding Timestamp, StringFormat='{0:HH:mm}'}" 
+                                       FontSize="10" 
+                                       TextColor="Gray" 
+                                       HorizontalOptions="End"/>
+                            </StackLayout>
+                        </Frame>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Input Area -->
+        <Grid Grid.Row="1" 
+              ColumnDefinitions="*, Auto" 
+              Padding="0,10,0,0">
+            <Entry Grid.Column="0"
+                   Text="{Binding NewMessage}"
+                   Placeholder="Type your message"
+                   ReturnCommand="{Binding SendMessageCommand}"
+                   Margin="0,0,10,0"/>
+            <Button Grid.Column="1"
+                    Text="Send"
+                    Command="{Binding SendMessageCommand}"
+                    IsEnabled="{Binding IsNotSending}"
+                    WidthRequest="80"/>
+        </Grid>
+    </Grid>
+</ContentPage>

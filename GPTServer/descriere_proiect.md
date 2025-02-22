@@ -19,6 +19,12 @@ APIurilor de generare de text).
     - Selector model AI, cu permissioning
     - Interfata grafica pentru chat, cu multi-conversation management.
 
+- Interfatare cu MobileApp (MaUI):
+    - JWT authentication (JWT nu este in general recomandat pentru aplicatii web single-server, pentru ca nu pot fi
+      invalidate exceptand un sistem de blacklisting. Este insa relativ simplu de implementat si de folosit pentru
+      scopul proiectului, si este un standard de facto pentru autentificare in aplicatii mobile, asa ca am ales sa il
+      folosesc pentru a simplifica integrarea cu aplicatia mobila).
+
 ## Mentiuni:
 
 - S-a utilizat modelul Anthropic Claude-3.5-Sonnet pentru generarea design-ului pentru interfata grafica a paginii de
@@ -36,3 +42,8 @@ APIurilor de generare de text).
         - Eliminarea zonelor redundante din design.
         - Pentru modificare usoara UI, am stabilit stilul, si dat exemple specifice. Am eliminat ulterior functiile
           superflue irelevante pentru proiect.
+
+## TODO:
+
+- Inainte de modificare pe public pt Github, de scos neaparat key-ul de API din proiect.
+- De bagat in .gitignore fisierul cu key-ul de API.

@@ -1,9 +1,8 @@
-﻿namespace GPTServer.Models
+﻿namespace GPTServer.Models;
+
+public class UploadPdfRequest
 {
-    public class UploadPdfRequest
-    {
-        public int ConversationId { get; set; }
-        public string PdfBase64 { get; set; }
-        public string FileName { get; set; }
-    }
+    public int ConversationId { get; set; }
+    public string PdfBase64 { get; set; }
+    public string FileName { get; set; }
 }

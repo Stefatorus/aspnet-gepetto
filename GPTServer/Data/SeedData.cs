@@ -27,7 +27,7 @@ public static class SeedData
 
         var adminPassword = "Sonnet123!";
         var user = await userManager.FindByEmailAsync("sonnet@example.com");
-        
+
         // Doar la seeding initial
         if (user == null)
         {

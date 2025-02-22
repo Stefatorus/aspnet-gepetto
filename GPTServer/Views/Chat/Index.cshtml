@@ -7,9 +7,9 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/site.css"/>
 </head>
 <body>
 <div class="container-fluid">
@@ -58,7 +58,7 @@
 
                 <!-- Sectiunea de upload PDF (ascunsa pentru modelul haiku) -->
                 <div id="sectiuneUploadPdf" class="input-group">
-                    <input type="file" id="inputPdf" accept="application/pdf" />
+                    <input type="file" id="inputPdf" accept="application/pdf"/>
                     <button class="btn btn-secondary" onclick="uploadPdf()">Upload PDF</button>
                 </div>
             </div>
@@ -83,6 +83,7 @@
                 sectiunePdf.style.display = "flex";
             }
         }
+
         document.getElementById('selectorModel').addEventListener('change', verificaModelPdf);
         window.addEventListener('load', verificaModelPdf);
 
@@ -136,31 +137,73 @@
             const userBubble = creeazabula("User", continutMesaj, new Date().toString());
             containerMesaje.appendChild(userBubble);
 
-            // Construim URL-ul pentru SSE (parametrii se trimit prin query string)
+            // Construim URL-ul pentru SSE
             const url = `/Chat/StreamMessage?conversationId=${conversatieCurentaId}&messageContent=${encodeURIComponent(continutMesaj)}&model=${encodeURIComponent(modelSelectat)}`;
             const eventSource = new EventSource(url);
 
-            // Creeaza o bula noua pentru mesajul de la Anthropic
-            bulaStreamingCurenta = creeazabula("Anthropic", "", new Date().toString());
-            containerMesaje.appendChild(bulaStreamingCurenta);
+            // Creeaza bula pentru raspunsul Anthropic
+            bulaStreamingCurenta = document.createElement("div");
+            bulaStreamingCurenta.classList.add("message-bubble", "assistant-bubble");
 
-            eventSource.onmessage = function(event) {
-                // Actualizam continutul bubilei curente; daca nu exista paragraf, il cream
-                let paragraf = bulaStreamingCurenta.querySelector("p");
-                if (!paragraf) {
-                    paragraf = document.createElement("p");
-                    bulaStreamingCurenta.appendChild(paragraf);
+            // Adauga div pentru continut si timestamp
+            const contentDiv = document.createElement("div");
+            contentDiv.className = "message-content";
+            bulaStreamingCurenta.appendChild(contentDiv);
+
+            const spanTimp = document.createElement("span");
+            spanTimp.classList.add("timestamp");
+            spanTimp.textContent = new Date().toLocaleString();
+            bulaStreamingCurenta.appendChild(spanTimp);
+
+            containerMesaje.appendChild(bulaStreamingCurenta);
+            containerMesaje.scrollTop = containerMesaje.scrollHeight;
+
+            let currentParagraph = document.createElement("p");
+            contentDiv.appendChild(currentParagraph);
+
+            eventSource.onmessage = function (event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.text) {
+                        // Process the incoming text chunk
+                        const text = data.text;
+
+                        // Split on newlines
+                        const lines = text.split('\n');
+
+                        // Process each line
+                        lines.forEach((line, index) => {
+                            if (index > 0) {
+                                // For lines after the first, create a new paragraph
+                                currentParagraph = document.createElement("p");
+                                contentDiv.appendChild(currentParagraph);
+                            }
+
+                            // Process markdown inline
+                            const processedText = line
+                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+                            currentParagraph.innerHTML += processedText;
+                        });
+
+                        // Auto-scroll
+                        containerMesaje.scrollTop = containerMesaje.scrollHeight;
+                    }
+                } catch (error) {
+                    console.error('Error processing message:', error);
                 }
-                // Inlocuim orice "\n" cu <br/> pentru a afisa corect
-                paragraf.innerHTML += event.data.replace(/\n/g, "<br/>");
             };
 
-            eventSource.addEventListener("end", function(e) {
+            eventSource.addEventListener("end", function (e) {
                 eventSource.close();
                 bulaStreamingCurenta = null;
+                containerMesaje.scrollTop = containerMesaje.scrollHeight;
             });
 
-            eventSource.onerror = function(e) {
+            eventSource.onerror = function (e) {
                 console.error("Eroare la streaming:", e);
                 eventSource.close();
                 bulaStreamingCurenta = null;
@@ -183,7 +226,7 @@
                 return;
             }
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const pdfBase64 = e.target.result.split(',')[1];
                 const numeFisier = fisier.name;
                 if (!conversatieCurentaId) {
@@ -192,7 +235,7 @@
                 }
                 fetch(`/Chat/UploadPdf`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         conversationId: conversatieCurentaId,
                         pdfBase64: pdfBase64,
@@ -239,7 +282,8 @@
                     link.textContent = `PDF: ${pdfData.fileName || "document.pdf"}`;
                     bula.appendChild(link);
                 }
-            } catch(e) { }
+            } catch (e) {
+            }
 
             if (!estePdf) {
                 // Inlocuim literal "</br>" si newline cu <br/> pentru a afisa corect
@@ -265,6 +309,7 @@
     .selected-conversation {
         background-color: lightgreen;
     }
+
     .message-bubble {
         max-width: 60%;
         margin-bottom: 8px;
@@ -272,18 +317,22 @@
         border-radius: 10px;
         clear: both;
     }
+
     .user-bubble {
         background-color: #dcf8c6;
         float: right;
     }
+
     .assistant-bubble {
         background-color: #f1f0f0;
         float: left;
     }
+
     .unknown-bubble {
         background-color: #e0e0e0;
         float: left;
     }
+
     .timestamp {
         display: block;
         font-size: 0.75rem;

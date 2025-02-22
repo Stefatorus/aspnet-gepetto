@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+  <!-- Base configuration: allow cleartext traffic for all domains -->
+  <base-config cleartextTrafficPermitted="true">
+    <trust-anchors>
+      <!-- Trust system and user certificates -->
+      <certificates src="system" />
+      <certificates src="user" />
+    </trust-anchors>
+  </base-config>
+
+  <!-- Domain configuration specifically for localhost -->
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="true">localhost</domain>
+  </domain-config>
+</network-security-config>
