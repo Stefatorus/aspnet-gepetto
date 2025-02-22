@@ -1,47 +1,65 @@
 ﻿@model ChatViewModel
-
 @{
-    ViewData["Title"] = "Chats";
+    var chatVm = Model; // redenumit intern pentru a evita conflicte
+    ViewData["Title"] = "Chaturi";
 }
 
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
 <div class="container-fluid">
     <div class="row">
-        <!-- Left Sidebar -->
+        <!-- Bara laterala stanga: lista de conversatii -->
         <div class="col-md-3">
             <div class="d-flex flex-column">
-                <button class="btn btn-primary mb-3" onclick="location.href='@Url.Action("CreateConversation")'">Add New
-                    Conversation
+                <button class="btn btn-primary mb-3" onclick="location.href='@Url.Action("CreateConversation")'">
+                    Adauga Conversatie Noua
                 </button>
-                <div class="list-group" id="conversationList" style="overflow-y: auto; max-height: 80vh;">
-                    @foreach (var conversation in Model.Conversations)
+                <div class="list-group" id="listaConversatii" style="overflow-y: auto; max-height: 80vh;">
+                    @foreach (var conversatie in chatVm.Conversations)
                     {
                         <a href="javascript:void(0);" class="list-group-item list-group-item-action"
-                           onclick="loadConversation(@conversation.Id)">
-                            @conversation.Title
+                           onclick="incarcaConversatie(@conversatie.Id, '@conversatie.Title')">
+                            @conversatie.Title
                         </a>
                     }
                 </div>
             </div>
         </div>
 
-        <!-- Main Content Area -->
+        <!-- Zona principala de chat -->
         <div class="col-md-9">
-            <div id="chatWindow" class="d-flex flex-column" style="display: none; height: 80vh;">
-                <h2 id="conversationTitle"></h2>
-                <div id="messages" class="flex-grow-1 overflow-auto border p-3 mb-3" style="height: 60vh;">
-                    @* Messages will be dynamically loaded here *@
+            <div id="fereastraChat" class="d-flex flex-column" style="display: none; height: 80vh;">
+                <h2 id="titluConversatie"></h2>
+
+                <!-- Zona de mesaje -->
+                <div id="mesaje" class="flex-grow-1 overflow-auto border p-3 mb-3" style="height: 60vh;">
+                    <!-- Mesajele vor fi incarcate aici dinamic -->
                 </div>
+
+                <!-- Selector model si caseta de text pentru mesaje -->
                 <div class="input-group mb-3">
-                    <select id="modelSelector" class="form-select">
-                        @foreach (var aiModel in Model.AvailableModels)
+                    <select id="selectorModel" class="form-select">
+                        @foreach (var modelAi in chatVm.AvailableModels)
                         {
-                            <option value="@aiModel">@aiModel</option>
+                            <option value="@modelAi">@modelAi</option>
                         }
                     </select>
                 </div>
-                <div class="input-group">
-                    <textarea id="messageInput" class="form-control" placeholder="Type your message here..."></textarea>
-                    <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                <div class="input-group mb-3">
+                    <textarea id="inputMesaj" class="form-control" placeholder="Scrie mesajul aici..."></textarea>
+                    <button class="btn btn-primary" onclick="trimiteMesajStreaming()">Trimite (Stream)</button>
+                </div>
+
+                <!-- Sectiunea de upload PDF (ascunsa pentru modelul haiku) -->
+                <div id="sectiuneUploadPdf" class="input-group">
+                    <input type="file" id="inputPdf" accept="application/pdf" />
+                    <button class="btn btn-secondary" onclick="uploadPdf()">Upload PDF</button>
                 </div>
             </div>
         </div>
@@ -50,51 +68,195 @@
 
 @section Scripts {
     <script>
-        function loadConversation(conversationId) {
-            // Remove the 'selected-conversation' class from all items
+        // Variabila globala pentru a pastra id-ul conversatiei curente
+        let conversatieCurentaId = null;
+        // Variabila pentru a tine bula streaming curenta
+        let bulaStreamingCurenta = null;
+
+        // Functie pentru a verifica daca trebuie ascunsa sectiunea de upload PDF
+        function verificaModelPdf() {
+            const selector = document.getElementById('selectorModel');
+            const sectiunePdf = document.getElementById("sectiuneUploadPdf");
+            if (selector.value === "claude-3-5-haiku-20241022") {
+                sectiunePdf.style.display = "none";
+            } else {
+                sectiunePdf.style.display = "flex";
+            }
+        }
+        document.getElementById('selectorModel').addEventListener('change', verificaModelPdf);
+        window.addEventListener('load', verificaModelPdf);
+
+        // Functie pentru incarcarea unei conversatii si a mesajelor aferente
+        function incarcaConversatie(id, titlu) {
             document.querySelectorAll('.list-group-item').forEach(item => {
                 item.classList.remove('selected-conversation');
             });
+            const selector = `a[onclick*="incarcaConversatie(${id},"]`;
+            document.querySelector(selector)?.classList.add('selected-conversation');
 
-            // Add the 'selected-conversation' class to the clicked item
-            document.querySelector(`a[onclick="loadConversation(${conversationId})"]`).classList.add('selected-conversation');
-
-            fetch(`/Chat/GetMessages?conversationId=${conversationId}`)
-                .then(response => response.json())
-                .then(messages => {
-                    document.getElementById("chatWindow").style.display = "flex";
-                    document.getElementById("messages").innerHTML = "";
-                    messages.forEach(message => {
-                        var messageElement = document.createElement("div");
-                        messageElement.textContent = `${message.Sender}: ${message.Content} (${new Date(message.Timestamp).toLocaleString()})`;
-                        document.getElementById("messages").appendChild(messageElement);
-                    });
+            conversatieCurentaId = id;
+            document.getElementById("titluConversatie").textContent = titlu;
+            fetch(`/Chat/GetMessages?conversationId=${id}`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Eroare la incarcarea mesajelor.");
+                    return response.json();
+                })
+                .then(mesaje => {
+                    const containerMesaje = document.getElementById("mesaje");
+                    containerMesaje.innerHTML = "";
+                    if (mesaje.length === 0) {
+                        containerMesaje.innerHTML = "<em>Niciun mesaj inca.</em>";
+                    } else {
+                        mesaje.forEach(msg => {
+                            const bula = creeazabula(msg.sender, msg.content, msg.timestamp);
+                            containerMesaje.appendChild(bula);
+                        });
+                    }
+                    document.getElementById("fereastraChat").style.display = "flex";
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert("A aparut o eroare la incarcarea mesajelor.");
                 });
         }
 
-        function sendMessage() {
-            var messageContent = document.getElementById("messageInput").value;
-            var selectedModel = document.getElementById("modelSelector").value;
-            var conversationId = document.querySelector('.selected-conversation').getAttribute('onclick').match(/\d+/)[0];
+        // Functie pentru trimiterea unui mesaj folosind streaming (SSE)
+        function trimiteMesajStreaming() {
+            const input = document.getElementById("inputMesaj");
+            const continutMesaj = input.value.trim();
+            if (!continutMesaj) return;
+            const modelSelectat = document.getElementById("selectorModel").value;
+            if (!conversatieCurentaId) {
+                alert("Selecteaza o conversatie mai intai.");
+                return;
+            }
+            const containerMesaje = document.getElementById("mesaje");
 
-            fetch(`/Chat/SendMessage`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    conversationId: conversationId,
-                    messageContent: messageContent,
-                    model: selectedModel
+            // Adauga imediat bula mesajului utilizatorului
+            const userBubble = creeazabula("User", continutMesaj, new Date().toString());
+            containerMesaje.appendChild(userBubble);
+
+            // Construim URL-ul pentru SSE (parametrii se trimit prin query string)
+            const url = `/Chat/StreamMessage?conversationId=${conversatieCurentaId}&messageContent=${encodeURIComponent(continutMesaj)}&model=${encodeURIComponent(modelSelectat)}`;
+            const eventSource = new EventSource(url);
+
+            // Creeaza o bula noua pentru mesajul de la Anthropic
+            bulaStreamingCurenta = creeazabula("Anthropic", "", new Date().toString());
+            containerMesaje.appendChild(bulaStreamingCurenta);
+
+            eventSource.onmessage = function(event) {
+                // Actualizam continutul bubilei curente; daca nu exista paragraf, il cream
+                let paragraf = bulaStreamingCurenta.querySelector("p");
+                if (!paragraf) {
+                    paragraf = document.createElement("p");
+                    bulaStreamingCurenta.appendChild(paragraf);
+                }
+                // Inlocuim orice "\n" cu <br/> pentru a afisa corect
+                paragraf.innerHTML += event.data.replace(/\n/g, "<br/>");
+            };
+
+            eventSource.addEventListener("end", function(e) {
+                eventSource.close();
+                bulaStreamingCurenta = null;
+            });
+
+            eventSource.onerror = function(e) {
+                console.error("Eroare la streaming:", e);
+                eventSource.close();
+                bulaStreamingCurenta = null;
+            };
+
+            // Stergem continutul casetei de text
+            input.value = "";
+        }
+
+        // Functie pentru upload PDF
+        function uploadPdf() {
+            const inputPdf = document.getElementById("inputPdf");
+            if (!inputPdf.files || inputPdf.files.length === 0) {
+                alert("Selecteaza un fisier PDF.");
+                return;
+            }
+            const fisier = inputPdf.files[0];
+            if (fisier.type !== "application/pdf") {
+                alert("Doar fisiere PDF sunt acceptate.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const pdfBase64 = e.target.result.split(',')[1];
+                const numeFisier = fisier.name;
+                if (!conversatieCurentaId) {
+                    alert("Selecteaza o conversatie mai intai.");
+                    return;
+                }
+                fetch(`/Chat/UploadPdf`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversationId: conversatieCurentaId,
+                        pdfBase64: pdfBase64,
+                        fileName: numeFisier
+                    })
                 })
-            })
-                .then(response => response.json())
-                .then(responseMessage => {
-                    var messageElement = document.createElement("div");
-                    messageElement.textContent = `${responseMessage.Sender}: ${responseMessage.Content} (${new Date(responseMessage.Timestamp).toLocaleString()})`;
-                    document.getElementById("messages").appendChild(messageElement);
-                    document.getElementById("messageInput").value = "";
-                });
+                    .then(response => {
+                        if (!response.ok) throw new Error("Eroare la upload PDF.");
+                        return response.json();
+                    })
+                    .then(msgPdf => {
+                        const containerMesaje = document.getElementById("mesaje");
+                        containerMesaje.appendChild(creeazabula(msgPdf.sender, msgPdf.content, msgPdf.timestamp));
+                        inputPdf.value = "";
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("A aparut o eroare la upload-ul PDF.");
+                    });
+            };
+            reader.readAsDataURL(fisier);
+        }
+
+        // Functie pentru a crea o bula de chat (mesaj) in functie de expeditor
+        function creeazabula(expeditor, continut, timestamp) {
+            const bula = document.createElement("div");
+            bula.classList.add("message-bubble");
+            if (expeditor === "User") {
+                bula.classList.add("user-bubble");
+            } else if (expeditor === "Anthropic") {
+                bula.classList.add("assistant-bubble");
+            } else {
+                bula.classList.add("unknown-bubble");
+            }
+
+            let estePdf = false;
+            try {
+                const pdfData = JSON.parse(continut);
+                if (pdfData && pdfData.pdfBase64) {
+                    estePdf = true;
+                    const link = document.createElement("a");
+                    link.href = "data:application/pdf;base64," + pdfData.pdfBase64;
+                    link.download = pdfData.fileName || "document.pdf";
+                    link.textContent = `PDF: ${pdfData.fileName || "document.pdf"}`;
+                    bula.appendChild(link);
+                }
+            } catch(e) { }
+
+            if (!estePdf) {
+                // Inlocuim literal "</br>" si newline cu <br/> pentru a afisa corect
+                const formattedContent = continut
+                    .replace(/<\/br>/gi, "<br/>")
+                    .replace(/\n/g, "<br/>");
+                let paragraf = document.createElement("p");
+                paragraf.innerHTML = formattedContent;
+                bula.appendChild(paragraf);
+            }
+
+            const spanTimp = document.createElement("span");
+            spanTimp.classList.add("timestamp");
+            const timpText = timestamp ? new Date(timestamp).toLocaleString() : "Timp necunoscut";
+            spanTimp.textContent = timpText;
+            bula.appendChild(spanTimp);
+            return bula;
         }
     </script>
 }
@@ -103,4 +265,32 @@
     .selected-conversation {
         background-color: lightgreen;
     }
+    .message-bubble {
+        max-width: 60%;
+        margin-bottom: 8px;
+        padding: 10px;
+        border-radius: 10px;
+        clear: both;
+    }
+    .user-bubble {
+        background-color: #dcf8c6;
+        float: right;
+    }
+    .assistant-bubble {
+        background-color: #f1f0f0;
+        float: left;
+    }
+    .unknown-bubble {
+        background-color: #e0e0e0;
+        float: left;
+    }
+    .timestamp {
+        display: block;
+        font-size: 0.75rem;
+        color: #666;
+        margin-top: 5px;
+        text-align: right;
+    }
 </style>
+</body>
+</html>

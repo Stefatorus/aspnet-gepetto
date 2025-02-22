@@ -18,6 +18,7 @@ public static class SeedData
             if (!roleExist) roleResult = await roleManager.CreateAsync(new IdentityRole(roleName));
         }
 
+        // Generare user admin (cu acces sonnet)
         var adminUser = new IdentityUser
         {
             UserName = "sonnet@example.com",
@@ -26,7 +27,8 @@ public static class SeedData
 
         var adminPassword = "Sonnet123!";
         var user = await userManager.FindByEmailAsync("sonnet@example.com");
-
+        
+        // Doar la seeding initial
         if (user == null)
         {
             var createAdminUser = await userManager.CreateAsync(adminUser, adminPassword);
