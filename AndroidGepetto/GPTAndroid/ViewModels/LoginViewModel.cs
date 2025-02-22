@@ -1,75 +1,76 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GPTAndroid.Services;
 
 namespace GPTAndroid.ViewModels;
 
-public class LoginViewModel : INotifyPropertyChanged
+public partial class LoginViewModel : ObservableObject
 {
     private readonly AuthService _authService;
-    private bool _isBusy;
+
+    [ObservableProperty]
+    private string _email;
+
+    [ObservableProperty]
     private string _password;
-    private string _username;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+    private bool _isBusy;
+
+    public bool IsNotBusy => !IsBusy;
 
     public LoginViewModel(AuthService authService)
     {
         _authService = authService;
-        LoginCommand = new AsyncRelayCommand(LoginAsync);
     }
 
-    public string Username
-    {
-        get => _username;
-        set
-        {
-            _username = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public string Password
-    {
-        get => _password;
-        set
-        {
-            _password = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public bool IsBusy
-    {
-        get => _isBusy;
-        set
-        {
-            _isBusy = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public ICommand LoginCommand { get; }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
+    [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private async Task LoginAsync()
     {
-        if (IsBusy)
+        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+        {
+            await Application.Current.MainPage.DisplayAlert(
+                "Error", 
+                "Please enter both email and password", 
+                "OK");
             return;
-        IsBusy = true;
+        }
 
-        var success = await _authService.LoginAsync(Username, Password);
-        if (success)
-            // Navigate to Conversations Page on success
-            await Shell.Current.GoToAsync("///ConversationsPage");
-
-        // Handle error (show message, etc.)
-        IsBusy = false;
+        try
+        {
+            IsBusy = true;
+            var success = await _authService.LoginAsync(Email, Password);
+            
+            if (success)
+            {
+                // Navigare către pagina de conversații
+                await Shell.Current.GoToAsync("//ConversationsPage");
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert(
+                    "Error", 
+                    "Invalid email or password", 
+                    "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert(
+                "Error",
+                "An error occurred during login. Please try again.",
+                "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    [RelayCommand]
+    private async Task NavigateToRegisterAsync()
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        await Shell.Current.GoToAsync("//RegisterPage");
     }
 }

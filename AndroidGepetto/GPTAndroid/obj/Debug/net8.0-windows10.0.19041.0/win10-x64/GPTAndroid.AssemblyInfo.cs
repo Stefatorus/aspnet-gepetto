@@ -17,7 +17,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GPTAndroid")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+113b2c302ffedfc22e1d45b98e09f36d49191882")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+df0bb9a808c582bae6ec5596dedc457655690652")]
 [assembly: System.Reflection.AssemblyProductAttribute("GPTAndroid")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GPTAndroid")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
